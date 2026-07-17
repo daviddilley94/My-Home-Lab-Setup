@@ -8,7 +8,8 @@ A hands-on environment built to simulate enterprise IT environments, practice ne
 This lab was built to practice Active Directory configuration, network segmentation, and basic virtualization management.
 
 * **Goal:** Practice domain administration and secure network configuration.
-* **Key Technologies:** Active Directory, pfSense, VirtualBox, ProxMox, Ubuntu Server, Windows 10/11, Windows Server 2022
+* **Key Technologies:** Proxmox VE (Nested), Oracle VirtualBox, Windows Server 2022, Windows 11 Enterprise, pfSense, Ubuntu Server 22.04 LTS
+* **Hypervisor Layer:** Type 1 Proxmox VE hypervisor running nested inside a Type 2 VirtualBox sandbox environment.
 
 * **WAN/LAN Gateway:** pfSense Virtual Firewall
 * **Domain Controller:** Windows Server 2022 (IP: `192.168.10.10`)
@@ -22,11 +23,13 @@ This lab was built to practice Active Directory configuration, network segmentat
 ### Hardware Specs
 | Component | Device / Specification | Purpose |
 | :--- | :--- | :--- |
-| **Host Machine** | AMD Ryzen 7 2700x 6 core, GTX 1080, 16gb (2 x 8) DDR4 Ram | Hypervisor Server |
-| **Network** | Ubiquiti UniFi Switch & AP | Physical VLAN segmentation |
-
+| Component | Device / Specification | Purpose |
+| :--- | :--- | :--- |
+| **Host CPU** | AMD Ryzen 7 2700X (8C / 16T) | Allocating 4 Cores to the virtualized Proxmox environment |
+| **Host RAM** | 16 GB DDR4 | Allocating 8 GB to Proxmox, leaving 8 GB for the daily host OS |
+| **Storage** | 200GB Virtual Disk (`.vdi`) | Dedicated virtual block storage for nested infrastructure |
 ### Hypervisor & VMs
-* **Hypervisor:** Proxmox VE 9.2 (built inside a VirtualBox VM) - 7 CPU cores, 8gb ram
+* **Hypervisor:** Proxmox VE 9.2 (built inside a VirtualBox VM) - 4 CPU cores, 8gb ram
   * **VM 1:** pfSense (Router/Firewall) - 2 Cores, 2GB RAM
   * **VM 2:** Windows Server 2022 (Active Directory) - 2 Cores, 4GB RAM
   * **VM 3:** Ubuntu Server (Docker Host) - 2 Cores, 4GB RAM
@@ -61,10 +64,10 @@ Detail how you actually built this. Keep it clear enough that another IT tech co
 
 Show off your problem-solving skills here. Recruiters care more about *how you fix things* than a perfect run.
 
-> 💡 **Issue:** Windows 11 client VM could not resolve the `lab.local` domain when attempting to join.
-> * **Root Cause:** The client VM's network adapter was pointing to public DNS (`8.8.8.8`) instead of the Domain Controller (`192.168.10.10`).
-> * **Resolution:** Configured the local DHCP server on pfSense to hand out the Domain Controller's IP as the primary DNS server. Resolved instantly.
-
+> 💡 **Issue:** Proxmox VE kernel panic / continuous reboot loop right after reaching the login console screen inside VirtualBox.
+> 
+> * **Root Cause:** Resource contention and CPU scheduling synchronization delays. Allocating too many CPU cores (6) to the nested Type 2 VirtualBox environment on an 8-core host machine starved the host OS of processing threads, causing timing mismatches that forced the Proxmox kernel to panic and reset.
+> * **Resolution:** Reduced the VirtualBox VM CPU allocation down to **4 Cores** and ensured that hardware-enforced security features (**PAE/NX** and **Nested VT-x/AMD-V**) were explicitly enabled. This instantly stabilized the kernel execution environment.
 ---
 
 ## 🎯 Next Steps & Future Plans
