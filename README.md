@@ -52,9 +52,12 @@ Detail how you actually built this. Keep it clear enough that another IT tech co
 ---
 
 ## 🔍 Troubleshooting & Lessons Learned
-> **Issue:** ProxMox VM assigned URL could not connect.
-> **Root Cause** Physical network card blocking bridged connection between VM and host.
-> **Resolution**
+> 🔍 **Issue:** Proxmox VE web interface timed out or failed to connect when switching VirtualBox from a Bridged Adapter to a NAT Network.
+> 
+> * **Root Cause:** Proxmox assigned a static IP address to its virtual bridge (`vmbr0`) during the initial installation. When the VirtualBox network type was changed to a NAT Network to bypass Wi-Fi hardware limitations, the virtual machine was assigned a new private subnet IP (10.0.2.15). However, Proxmox was still listening internally on the old static IP, causing a total disconnect and timeout.
+> * **Resolution:** Resolved the issue in two phases:
+>   1. **Updated Proxmox Network Configurations:** Logged directly into the Proxmox text console via VirtualBox, opened `/etc/network/interfaces` and `/etc/hosts` using `nano`, and updated the static IP definitions to match the new NAT subnet gateway (10.0.2.15 / 10.0.2.1).
+>   2. **Configured VirtualBox Port Forwarding:** Poked a secure hole through the VirtualBox NAT firewall. Created a port forwarding rule mapping the host's loopback address (`127.0.0.1:8006`) directly to the Proxmox guest VM (`10.0.2.15:8006`). This allowed seamless access via the local host's web browser using `https://127.0.0.1:8006`.
 
 Show off your problem-solving skills here. Recruiters care more about *how you fix things* than a perfect run.
 
