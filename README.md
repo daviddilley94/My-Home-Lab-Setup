@@ -32,7 +32,7 @@ This lab was built to practice Active Directory configuration, network segmentat
 * **Hypervisor:** Proxmox VE 9.2 (built inside a VirtualBox VM) - 4 CPU cores, 8gb ram
   * **VM 1:** pfSense (Router/Firewall) - 1 Cores, 2GB RAM
   * **VM 2:** Windows Server 2022 (Active Directory) - 2 Cores, 4GB RAM
-  * **VM 3:** Ubuntu Server (Docker Host) - 1 Cores, 4GB RAM
+  * **VM 3:** Ubuntu Server (Docker Host) - 1 Cores, 2GB RAM
 
 ---
 
